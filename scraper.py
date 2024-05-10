@@ -3,22 +3,20 @@ from bs4 import BeautifulSoup
 
 
 def main():
-    user_url = "https://www.nature.com/nature/articles?sort=PubDate&year=2020&page=3"
+    user_url = input("Enter a URL: ")
     soup = get_web_response(user_url)
-    article_tag = soup.find_all("article")
+    for tag in get_tags(soup):
+        print(tag)
 
-    for tag in article_tag:
-        span_tag = tag.span
-        if "data-test" not in span_tag.attrs.keys():
-            continue
-        article_link = user_url + tag.a["href"]
-        article_soup = get_web_response(article_link)
-        article_content = article_soup.find_all("p")
 
-        for article_tag in article_content:
-            print(f"\n{article_tag}")
-            print("-------------------------------------------------------------------------------------------------")
-            print("-------------------------------------------------------------------------------------------------\n")
+def get_tags(obj):
+    tags = {}
+    for tag in obj.find_all():
+        if tag.name not in tags:
+            tags[tag.name] = 1
+        else:
+            tags[tag.name] += 1
+    return tags
 
 
 def get_web_response(url):
