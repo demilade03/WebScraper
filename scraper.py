@@ -4,13 +4,12 @@ from bs4 import BeautifulSoup
 
 def main():
     user_url = input("Enter a URL: ")
-    soup = get_web_response(user_url)
-    if isinstance(soup, int):
-        print(soup)
-    else:
+    response = requests.get(user_url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, "lxml")
         tag_list = get_child_tags(soup)
         for num, tag in enumerate(tag_list):
-            print(f"{(num + 1):3d}. {tag}")
+            print(f"{(num + 1):-3d}. {tag}")
         user_tag = int(input("\nWhat tag will you like to inspect (Enter the corresponding number): "))
         tag_elements = get_tag_elements(soup, tag_list, user_tag)
         for tag in tag_elements:
@@ -19,6 +18,8 @@ def main():
             print(f"String in tag '{tag.name}': {get_tag_string(tag)}" if get_tag_string(tag)
                   else "No strings in this tag")
             print("\n-----------------------------------------------------------------------------------------------\n")
+    else:
+        print(response.status_code)
 
 
 def get_child_tags(tag):
@@ -47,15 +48,6 @@ def get_tag_string(tag):
     """Get the string within a tag."""
     tag_string = tag.string
     return tag_string
-
-
-def get_web_response(url):
-    """Get the webpage document and parse it."""
-    response = requests.get(url)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.content, "lxml")
-        return soup
-    return response.status_code
 
 
 if __name__ == "__main__":
