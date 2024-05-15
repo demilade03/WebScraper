@@ -3,13 +3,13 @@ from bs4 import BeautifulSoup
 
 
 def main():
-    user_url = input("Enter a URL: ")
-    response = requests.get(user_url)
+    user_url = input("Enter a URL: ").strip()
+    response = get_web_response(user_url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.content, "lxml")
         tag_list = get_child_tags(soup)
         for num, tag in enumerate(tag_list):
-            print(f"{(num + 1):-3d}. {tag}")
+            print(f"{(num + 1):4}. {tag}")
         user_tag = int(input("\nWhat tag will you like to inspect (Enter the corresponding number): "))
         tag_elements = get_tag_elements(soup, tag_list, user_tag)
         for tag in tag_elements:
@@ -48,6 +48,14 @@ def get_tag_string(tag):
     """Get the string within a tag."""
     tag_string = tag.string
     return tag_string
+
+
+def get_web_response(url):
+    try:
+        return requests.get(url)
+    except requests.exceptions.MissingSchema:
+        new_url = f"https://{url}"
+        return requests.get(new_url)
 
 
 if __name__ == "__main__":
